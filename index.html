@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ms"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kereta Api Ajaib – Studio Video</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--red:#e63946;--blue:#1d4ed8;--gold:#f5b700;--sky:#e8f3ff;--ink:#1b2a4a;--card:#fff;--ok:#1f9d55}
+*{box-sizing:border-box}body{margin:0;font-family:Fredoka,"Trebuchet MS",sans-serif;background:var(--sky);color:var(--ink);display:flex;min-height:100vh}
+nav{width:230px;background:var(--blue);color:#fff;padding:20px 14px;flex-shrink:0}
+nav h1{font-size:20px;margin:0 0 22px;line-height:1.2}nav h1 small{display:block;color:var(--gold);font-weight:500;font-size:14px}
+nav a{display:block;padding:11px 14px;margin:4px 0;border-radius:12px;color:#fff;text-decoration:none;cursor:pointer;border-left:6px solid transparent}
+nav a.on{background:#fff;color:var(--blue);border-left-color:var(--red);font-weight:600}
+main{flex:1;padding:28px;max-width:980px}
+h2{font-size:28px;margin:0 0 6px}.track{height:10px;margin:0 0 22px;background:repeating-linear-gradient(90deg,var(--ink) 0 4px,transparent 4px 18px) bottom/100% 3px no-repeat,linear-gradient(var(--gold),var(--gold)) center/100% 3px no-repeat;position:relative}
+.track::after{content:"🚂";position:absolute;right:0;top:-18px;font-size:24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.stat{background:var(--card);border-radius:18px;padding:16px;border-bottom:6px solid var(--c,var(--blue))}.stat b{font-size:38px;display:block}
+.card{background:var(--card);border-radius:18px;padding:18px;margin-bottom:14px}
+label{display:block;font-weight:500;margin:12px 0 4px}input,select,textarea{width:100%;padding:10px 12px;border:2px solid #c9dcf5;border-radius:12px;font:inherit;background:#fff}
+input:focus,select:focus,textarea:focus,button:focus-visible,nav a:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+textarea{min-height:70px}.chk{display:flex;flex-wrap:wrap;gap:8px}.chk label{margin:0;background:var(--sky);padding:8px 12px;border-radius:999px;font-weight:400}.chk input{width:auto;margin-right:6px}
+button{font:inherit;font-weight:500;border:0;border-radius:999px;padding:10px 20px;background:var(--red);color:#fff;cursor:pointer;margin:6px 6px 0 0}
+button.alt{background:var(--blue)}button.ok{background:var(--ok)}button.gh{background:#e3ebf7;color:var(--ink)}
+.tag{display:inline-block;padding:3px 12px;border-radius:999px;font-size:13px;color:#fff;background:var(--blue)}
+.tag.draf{background:#7a869a}.tag.menunggu{background:var(--gold);color:var(--ink)}.tag.diluluskan{background:var(--ok)}.tag.diterbitkan{background:var(--red)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.say{border-left:6px solid var(--gold);padding-left:10px;margin:6px 0}.pr{font-size:13px;background:#f3f7fd;padding:8px;border-radius:10px;margin-top:4px;word-break:break-word}
+.warn{background:#fff6d6;border:2px solid var(--gold);border-radius:14px;padding:10px 14px;margin-bottom:14px}
+@media(max-width:700px){body{flex-direction:column}nav{width:100%}main{padding:16px}}
+</style></head><body>
+<nav><h1>Kereta Api Ajaib<small>Studio Video Kanak-kanak</small></h1><div id="menu"></div></nav>
+<main><h2 id="tt"></h2><div class="track"></div><div id="v"></div></main>
+<script>
+const $=s=>document.querySelector(s),esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ST={draf:"Draf",menunggu:"Menunggu kelulusan",diluluskan:"Diluluskan",diterbitkan:"Diterbitkan"};
+const KAT=["Warna","Nombor","Bentuk","Haiwan","Abjad","Perkataan mudah"];
+const PAGES=[["dash","Dashboard"],["baru","Cipta Video Baharu"],["senarai","Senarai Projek"],["watak","Panduan Watak"],["tetap","Tetapan"]];
+let P=[],C={},cur=null;
+const api=async(u,m="GET",b)=>{const r=await fetch(u,{method:m,headers:{"Content-Type":"application/json"},body:b?JSON.stringify(b):undefined});if(!r.ok){alert((await r.json()).detail||"Ralat");throw 0}return r.json()};
+async function go(p,id){cur=id||null;P=await api("/api/projects");C=await api("/api/characters");
+ $("#menu").innerHTML=PAGES.map(([k,n])=>`<a tabindex=0 class="${k==p||(p=="detail"&&k=="senarai")?"on":""}" onclick="go('${k}')">${n}</a>`).join("");
+ $("#tt").textContent=p=="detail"?"Butiran Projek":PAGES.find(x=>x[0]==p)[1];await V[p]()}
+const V={
+dash(){const n=s=>P.filter(p=>p.status==s).length,t=[["Jumlah projek",P.length,"#1d4ed8"],["Draf",n("draf"),"#7a869a"],["Menunggu kelulusan",n("menunggu"),"#f5b700"],["Diluluskan",n("diluluskan"),"#1f9d55"],["Diterbitkan",n("diterbitkan"),"#e63946"]];
+ $("#v").innerHTML=`<div class=grid>${t.map(x=>`<div class=stat style="--c:${x[2]}"><b>${x[1]}</b>${x[0]}</div>`).join("")}</div><div class=card style="margin-top:16px">Tiada penerbitan automatik. Setiap video mesti diluluskan oleh anda dahulu, kemudian dimuat naik sendiri ke YouTube.</div>`},
+baru(){$("#v").innerHTML=`<div class=card><label>Tajuk episod<input id=a value="Kereta Api Ajaib Belajar 3 Warna"></label>
+ <label>Topik pembelajaran (asingkan dengan koma)<input id=b value="Merah, Biru dan Kuning"></label>
+ <label>Kategori pembelajaran<select id=c>${KAT.map(k=>`<option>${k}`).join("")}</select></label>
+ <label>Sasaran umur<select id=d><option>3-4 tahun<option>4-5 tahun<option>5-6 tahun</select></label>
+ <label>Tempoh video<select id=e><option value=30>30 saat<option value=45 selected>45 saat<option value=60>60 saat</select></label>
+ <label>Watak yang terlibat</label><div class=chk>${Object.keys(C).map(k=>`<label><input type=checkbox name=w value="${k}" ${["Captain Choo","Momo"].includes(k)?"checked":""}>${k}</label>`).join("")}</div>
+ <label>Mesej pembelajaran<textarea id=f>Warna ada di sekeliling kita.</textarea></label>
+ <button onclick="mk()">Jana Skrip</button></div>`},
+senarai(){$("#v").innerHTML=P.length?P.slice().reverse().map(p=>`<div class="card row"><div><b>${esc(p.tajuk)}</b><br>${esc(p.kategori)} · ${p.tempoh} saat · ${p.dicipta}</div><div><span class="tag ${p.status}">${ST[p.status]}</span> <button class=alt onclick="go('detail','${p.id}')">Buka</button></div></div>`).join(""):`<div class=card>Belum ada projek. Tekan "Cipta Video Baharu" untuk mula.</div>`},
+detail(){const p=P.find(x=>x.id==cur),s=p.skrip,lock=["diluluskan","diterbitkan"].includes(p.status);
+ const B=(t,c,l)=>`<button class="${c}" onclick="st('${p.id}','${t}')">${l}</button>`;
+ $("#v").innerHTML=`<div class="card row"><div><b>${esc(p.tajuk)}</b><br>${esc(p.topik)} · ${esc(p.kategori)} · ${p.tempoh} saat</div><span class="tag ${p.status}">${ST[p.status]}</span></div>
+ ${p.status=="menunggu"?`<div class=warn>Semak skrip dan prompt imej dengan teliti sebelum meluluskan.</div>`:""}
+ <div class=card><h3>Skrip</h3>
+ <label>Salam pembuka<textarea id=s1 ${lock?"disabled":""}>${esc(s.salam)}</textarea></label>
+ <label>Cerita pendidikan pendek<textarea id=s2 ${lock?"disabled":""}>${esc(s.cerita)}</textarea></label>
+ <label>Dialog watak</label>${s.dialog.map(d=>`<div class=say><b>${esc(d.watak)}:</b> ${esc(d.teks)}</div>`).join("")}
+ <label>Penerangan pembelajaran<textarea id=s3 ${lock?"disabled":""}>${esc(s.penerangan)}</textarea></label>
+ <label>Misi mudah<textarea id=s4 ${lock?"disabled":""}>${esc(s.misi)}</textarea></label>
+ <label>Penutup<textarea id=s5 ${lock?"disabled":""}>${esc(s.penutup)}</textarea></label>
+ ${lock?"":`<button class=alt onclick="sv('${p.id}')">Simpan Suntingan</button><button class=gh onclick="rg('${p.id}')">Jana Semula</button>`}</div>
+ <div class=card><h3>Adegan dan Prompt Imej</h3>${s.adegan.map(a=>`<p><b>Adegan ${a.no}:</b> ${esc(a.huraian)}</p><div class=pr>${esc(a.prompt_imej)}</div>`).join("")}</div>
+ <div class=card><h3>Kelulusan</h3>${p.status=="draf"?B("menunggu","","Hantar untuk kelulusan"):""}
+ ${p.status=="menunggu"?B("diluluskan","ok","Lulus")+B("draf","gh","Kembalikan ke draf"):""}
+ ${p.status=="diluluskan"?B("diterbitkan","ok","Tanda sudah diterbitkan")+B("draf","gh","Buka semula sebagai draf"):""}
+ <button class=gh onclick="dl('${p.id}')">Padam projek</button></div>`},
+watak(){$("#v").innerHTML=Object.entries(C).map(([k,c])=>`<div class=card><b>${k}</b> – ${c.peranan}<br>Personaliti: ${c.sifat}<div class=pr>${c.rupa}</div></div>`).join("")+`<div class=card>Rupa, warna, aksesori dan personaliti watak tidak boleh diubah antara episod.</div>`},
+async tetap(){const s=await api("/api/settings");$("#v").innerHTML=`<div class=card><label>Nama saluran YouTube<input id=t1 value="${esc(s.saluran)}"></label><label>Hashtag lalai<input id=t2 value="${esc(s.hashtag)}"></label><label>Bahasa<input value="Bahasa Melayu" disabled></label><button onclick="ss()">Simpan Tetapan</button></div>`}};
+async function mk(){const w=[...document.querySelectorAll("[name=w]:checked")].map(x=>x.value);
+ if(!$("#a").value.trim()||!$("#b").value.trim())return alert("Sila isi tajuk dan topik.");
+ const p=await api("/api/projects","POST",{tajuk:$("#a").value,topik:$("#b").value,kategori:$("#c").value,umur:$("#d").value,tempoh:+$("#e").value,watak:w,mesej:$("#f").value});go("detail",p.id)}
+const st=async(i,t)=>{await api(`/api/projects/${i}/status/${t}`,"POST");go("detail",i)};
+const rg=async i=>{await api(`/api/projects/${i}/skrip`,"POST");go("detail",i)};
+const dl=async i=>{if(confirm("Padam projek ini?")){await api("/api/projects/"+i,"DELETE");go("senarai")}};
+async function sv(i){const p=P.find(x=>x.id==i),s=p.skrip;Object.assign(s,{salam:$("#s1").value,cerita:$("#s2").value,penerangan:$("#s3").value,misi:$("#s4").value,penutup:$("#s5").value});await api(`/api/projects/${i}/skrip`,"PUT",s);go("detail",i)}
+async function ss(){await api("/api/settings","PUT",{saluran:$("#t1").value,hashtag:$("#t2").value,bahasa:"Bahasa Melayu"});alert("Tetapan disimpan.")}
+go("dash");
+</script></body></html>
